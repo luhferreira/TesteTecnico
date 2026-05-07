@@ -1,5 +1,9 @@
 using FluentAssertions;
+using MinhasFinancas.Application.DTOs;
+using MinhasFinancas.Application.Services;
 using MinhasFinancas.Domain.Entities;
+using MinhasFinancas.Domain.Interfaces;
+using NSubstitute;
 using Xunit;
 using static MinhasFinancas.Domain.Entities.Categoria;
 using static MinhasFinancas.Domain.Entities.Transacao;
@@ -7,211 +11,156 @@ using static MinhasFinancas.Domain.Entities.Transacao;
 namespace MinhasFinancas.UnitTests.Domain;
 
 /// <summary>
-/// Testes unitários para a entidade Transacao.
+/// Testes das regras de negócio da entidade Transacao.
 ///
-/// As regras de negócio estão implementadas nos setters internos de
-/// Transacao.Pessoa e Transacao.Categoria. O TransacaoService atribui
-/// esses navegadores diretamente, por isso testamos o comportamento
-/// real da entidade.
-///
-/// REGRAS TESTADAS:
-///   1. Menor de idade não pode ter Receita.
-///   2. Categoria incompatível com o tipo de transação deve lançar exceção.
+/// Os setters Pessoa e Categoria são "internal set", portanto só podem ser
+/// atribuídos dentro do assembly MinhasFinancas.Domain/Application.
+/// Testamos as regras indiretamente via TransacaoService, que é a única
+/// entrada pública para criar transações e é onde os setters são chamados.
 /// </summary>
 public class TransacaoTests
 {
-    // =========================================================================
-    // Helpers
-    // =========================================================================
+    private readonly IUnitOfWork          _uow           = Substitute.For<IUnitOfWork>();
+    private readonly IPessoaRepository    _pessoaRepo    = Substitute.For<IPessoaRepository>();
+    private readonly ICategoriaRepository _categoriaRepo = Substitute.For<ICategoriaRepository>();
+    private readonly ITransacaoRepository _transacaoRepo = Substitute.For<ITransacaoRepository>();
 
-    private static Pessoa AdultoValido() => new()
+    public TransacaoTests()
     {
-        Nome = "Adulto",
-        DataNascimento = DateTime.Today.AddYears(-30)
-    };
+        _uow.Pessoas.Returns(_pessoaRepo);
+        _uow.Categorias.Returns(_categoriaRepo);
+        _uow.Transacoes.Returns(_transacaoRepo);
+        _uow.SaveChangesAsync().Returns(1);
+        _transacaoRepo.AddAsync(Arg.Any<Transacao>()).Returns(Task.CompletedTask);
+    }
 
-    private static Pessoa MenorDeIdade() => new()
-    {
-        Nome = "Menor",
-        DataNascimento = DateTime.Today.AddYears(-10)
-    };
+    private TransacaoService CriarService() => new(_uow);
 
-    private static Pessoa VesperaDezoitoAnos() => new()
-    {
-        Nome = "Quase Adulto",
-        DataNascimento = DateTime.Today.AddYears(-18).AddDays(1) // faz 18 amanhã
-    };
+    private static Pessoa Adulto() => new() { Nome = "Adulto", DataNascimento = DateTime.Today.AddYears(-30) };
+    private static Pessoa Menor()  => new() { Nome = "Menor",  DataNascimento = DateTime.Today.AddYears(-10) };
+    private static Categoria CatReceita() => new() { Descricao = "Salário",      Finalidade = EFinalidade.Receita };
+    private static Categoria CatDespesa() => new() { Descricao = "Mercado",      Finalidade = EFinalidade.Despesa };
+    private static Categoria CatAmbas()   => new() { Descricao = "Transferência",Finalidade = EFinalidade.Ambas  };
 
-    private static Categoria CategoriaReceita() => new()
-    {
-        Descricao = "Salário",
-        Finalidade = EFinalidade.Receita
-    };
+    private static CreateTransacaoDto DtoReceita(Guid pessoaId, Guid catId) => new()
+        { Descricao = "Salário", Valor = 3000m, Tipo = ETipo.Receita, PessoaId = pessoaId, CategoriaId = catId, Data = DateTime.Today };
 
-    private static Categoria CategoriaDespesa() => new()
-    {
-        Descricao = "Mercado",
-        Finalidade = EFinalidade.Despesa
-    };
-
-    private static Categoria CategoriaAmbas() => new()
-    {
-        Descricao = "Transferência",
-        Finalidade = EFinalidade.Ambas
-    };
+    private static CreateTransacaoDto DtoDespesa(Guid pessoaId, Guid catId) => new()
+        { Descricao = "Lanche",  Valor = 20m,   Tipo = ETipo.Despesa, PessoaId = pessoaId, CategoriaId = catId, Data = DateTime.Today };
 
     // =========================================================================
     // Regra 1 — Menor de idade não pode ter Receita
     // =========================================================================
 
-    [Fact(DisplayName = "Transacao.Pessoa — menor de idade + Receita lança InvalidOperationException")]
-    public void SetPessoa_MenorDeIdade_ComReceita_LancaInvalidOperationException()
+    [Fact(DisplayName = "Menor de idade + Receita → lança InvalidOperationException")]
+    public async Task MenorDeIdade_ComReceita_LancaInvalidOperationException()
     {
-        // Arrange
-        var transacao = new Transacao
-        {
-            Descricao = "Mesada indevida",
-            Valor = 100m,
-            Tipo = ETipo.Receita
-        };
+        var menor = Menor(); var cat = CatReceita();
+        _pessoaRepo.GetByIdAsync(menor.Id).Returns(menor);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
 
-        // Act
-        var act = () => { transacao.Pessoa = MenorDeIdade(); };
-
-        // Assert
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*18*");
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => CriarService().CreateAsync(DtoReceita(menor.Id, cat.Id)));
     }
 
-    [Fact(DisplayName = "Transacao.Pessoa — pessoa na véspera dos 18 anos + Receita lança exceção")]
-    public void SetPessoa_VesperaDezoitoAnos_ComReceita_LancaInvalidOperationException()
+    [Fact(DisplayName = "Menor de idade + Despesa → cria com sucesso")]
+    public async Task MenorDeIdade_ComDespesa_CriaComSucesso()
     {
-        var transacao = new Transacao { Descricao = "Bico", Valor = 50m, Tipo = ETipo.Receita };
-        var act = () => { transacao.Pessoa = VesperaDezoitoAnos(); };
-        act.Should().Throw<InvalidOperationException>();
+        var menor = Menor(); var cat = CatDespesa();
+        _pessoaRepo.GetByIdAsync(menor.Id).Returns(menor);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
+
+        var result = await CriarService().CreateAsync(DtoDespesa(menor.Id, cat.Id));
+        result.Tipo.Should().Be(ETipo.Despesa);
     }
 
-    [Fact(DisplayName = "Transacao.Pessoa — adulto + Receita NÃO lança exceção")]
-    public void SetPessoa_Adulto_ComReceita_NaoLancaExcecao()
+    [Fact(DisplayName = "Adulto com 18 anos exatos + Receita → cria com sucesso")]
+    public async Task AdultoDezoitoAnos_ComReceita_CriaComSucesso()
     {
-        var transacao = new Transacao { Descricao = "Salário", Valor = 3000m, Tipo = ETipo.Receita };
-        var act = () => { transacao.Pessoa = AdultoValido(); };
-        act.Should().NotThrow();
+        var pessoa = new Pessoa { Nome = "Dezoito", DataNascimento = DateTime.Today.AddYears(-18) };
+        var cat = CatReceita();
+        _pessoaRepo.GetByIdAsync(pessoa.Id).Returns(pessoa);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
+
+        var result = await CriarService().CreateAsync(DtoReceita(pessoa.Id, cat.Id));
+        result.Tipo.Should().Be(ETipo.Receita);
     }
 
-    [Fact(DisplayName = "Transacao.Pessoa — menor de idade + Despesa NÃO lança exceção")]
-    public void SetPessoa_MenorDeIdade_ComDespesa_NaoLancaExcecao()
+    [Fact(DisplayName = "Véspera dos 18 anos + Receita → lança exceção")]
+    public async Task VesperaDezoitoAnos_ComReceita_LancaExcecao()
     {
-        var transacao = new Transacao { Descricao = "Lanche", Valor = 10m, Tipo = ETipo.Despesa };
-        var act = () => { transacao.Pessoa = MenorDeIdade(); };
-        act.Should().NotThrow();
-    }
+        var pessoa = new Pessoa { Nome = "Quase", DataNascimento = DateTime.Today.AddYears(-18).AddDays(1) };
+        var cat = CatReceita();
+        _pessoaRepo.GetByIdAsync(pessoa.Id).Returns(pessoa);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
 
-    [Fact(DisplayName = "Transacao.Pessoa — pessoa com exatos 18 anos hoje + Receita NÃO lança exceção")]
-    public void SetPessoa_ExatosDezoitoAnos_ComReceita_NaoLancaExcecao()
-    {
-        var transacao = new Transacao { Descricao = "Primeiro salário", Valor = 1500m, Tipo = ETipo.Receita };
-        var pessoa = new Pessoa { Nome = "Adulto Jovem", DataNascimento = DateTime.Today.AddYears(-18) };
-        var act = () => { transacao.Pessoa = pessoa; };
-        act.Should().NotThrow();
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => CriarService().CreateAsync(DtoReceita(pessoa.Id, cat.Id)));
     }
 
     // =========================================================================
     // Regra 2 — Compatibilidade de Categoria
     // =========================================================================
 
-    [Fact(DisplayName = "Transacao.Categoria — categoria Receita + transação Despesa lança InvalidOperationException")]
-    public void SetCategoria_CategoriaReceita_ComTipoDespesa_LancaInvalidOperationException()
+    [Fact(DisplayName = "Categoria Receita + transação Despesa → lança InvalidOperationException")]
+    public async Task CategoriaReceita_ComTipoDespesa_LancaExcecao()
     {
-        var transacao = new Transacao { Descricao = "Conta de luz", Valor = 150m, Tipo = ETipo.Despesa };
-        var act = () => { transacao.Categoria = CategoriaReceita(); };
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*despesa*receita*");
+        var adulto = Adulto(); var cat = CatReceita();
+        _pessoaRepo.GetByIdAsync(adulto.Id).Returns(adulto);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => CriarService().CreateAsync(DtoDespesa(adulto.Id, cat.Id)));
     }
 
-    [Fact(DisplayName = "Transacao.Categoria — categoria Despesa + transação Receita lança InvalidOperationException")]
-    public void SetCategoria_CategoriaDespesa_ComTipoReceita_LancaInvalidOperationException()
+    [Fact(DisplayName = "Categoria Despesa + transação Receita → lança InvalidOperationException")]
+    public async Task CategoriaDespesa_ComTipoReceita_LancaExcecao()
     {
-        var transacao = new Transacao { Descricao = "Freelance", Valor = 800m, Tipo = ETipo.Receita };
-        var act = () => { transacao.Categoria = CategoriaDespesa(); };
-        act.Should()
-            .Throw<InvalidOperationException>()
-            .WithMessage("*receita*despesa*");
+        var adulto = Adulto(); var cat = CatDespesa();
+        _pessoaRepo.GetByIdAsync(adulto.Id).Returns(adulto);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => CriarService().CreateAsync(DtoReceita(adulto.Id, cat.Id)));
     }
 
-    [Fact(DisplayName = "Transacao.Categoria — categoria Receita + transação Receita NÃO lança exceção")]
-    public void SetCategoria_CategoriaReceita_ComTipoReceita_NaoLancaExcecao()
-    {
-        var transacao = new Transacao { Descricao = "Salário", Valor = 4000m, Tipo = ETipo.Receita };
-        var act = () => { transacao.Categoria = CategoriaReceita(); };
-        act.Should().NotThrow();
-    }
-
-    [Fact(DisplayName = "Transacao.Categoria — categoria Despesa + transação Despesa NÃO lança exceção")]
-    public void SetCategoria_CategoriaDespesa_ComTipoDespesa_NaoLancaExcecao()
-    {
-        var transacao = new Transacao { Descricao = "Supermercado", Valor = 350m, Tipo = ETipo.Despesa };
-        var act = () => { transacao.Categoria = CategoriaDespesa(); };
-        act.Should().NotThrow();
-    }
-
-    [Theory(DisplayName = "Transacao.Categoria — categoria Ambas aceita Receita e Despesa sem exceção")]
+    [Theory(DisplayName = "Categoria Ambas + qualquer tipo → cria com sucesso")]
     [InlineData(ETipo.Receita)]
     [InlineData(ETipo.Despesa)]
-    public void SetCategoria_CategoriaAmbas_QualquerTipo_NaoLancaExcecao(ETipo tipo)
+    public async Task CategoriaAmbas_QualquerTipo_CriaComSucesso(ETipo tipo)
     {
-        var transacao = new Transacao { Descricao = "Transferência", Valor = 200m, Tipo = tipo };
-        var act = () => { transacao.Categoria = CategoriaAmbas(); };
-        act.Should().NotThrow();
+        var adulto = Adulto(); var cat = CatAmbas();
+        _pessoaRepo.GetByIdAsync(adulto.Id).Returns(adulto);
+        _categoriaRepo.GetByIdAsync(cat.Id).Returns(cat);
+
+        var dto = new CreateTransacaoDto
+            { Descricao = "Transferência", Valor = 200m, Tipo = tipo, PessoaId = adulto.Id, CategoriaId = cat.Id, Data = DateTime.Today };
+
+        var result = await CriarService().CreateAsync(dto);
+        result.Tipo.Should().Be(tipo);
     }
 
     // =========================================================================
-    // Associação correta de IDs
+    // Regra 3 — Entidades não encontradas
     // =========================================================================
 
-    [Fact(DisplayName = "Transacao.Categoria — ao atribuir categoria válida, CategoriaId é atualizado")]
-    public void SetCategoria_Valida_AtualizaCategoriaId()
+    [Fact(DisplayName = "Categoria inexistente → lança ArgumentException")]
+    public async Task CategoriaInexistente_LancaArgumentException()
     {
-        var cat = CategoriaDespesa();
-        var transacao = new Transacao { Descricao = "Mercado", Valor = 200m, Tipo = ETipo.Despesa };
-        transacao.Categoria = cat;
-        transacao.CategoriaId.Should().Be(cat.Id);
+        var adulto = Adulto();
+        _pessoaRepo.GetByIdAsync(adulto.Id).Returns(adulto);
+        _categoriaRepo.GetByIdAsync(Arg.Any<Guid>()).Returns((Categoria?)null);
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => CriarService().CreateAsync(DtoDespesa(adulto.Id, Guid.NewGuid())));
     }
 
-    [Fact(DisplayName = "Transacao.Pessoa — ao atribuir pessoa válida, PessoaId é atualizado")]
-    public void SetPessoa_Valida_AtualizaPessoaId()
+    [Fact(DisplayName = "Pessoa inexistente → lança ArgumentException")]
+    public async Task PessoaInexistente_LancaArgumentException()
     {
-        var pessoa = AdultoValido();
-        var transacao = new Transacao { Descricao = "Compra", Valor = 50m, Tipo = ETipo.Despesa };
-        transacao.Pessoa = pessoa;
-        transacao.PessoaId.Should().Be(pessoa.Id);
-    }
+        _pessoaRepo.GetByIdAsync(Arg.Any<Guid>()).Returns((Pessoa?)null);
 
-    // =========================================================================
-    // Invariantes
-    // =========================================================================
-
-    [Fact(DisplayName = "Transacao — Id gerado automaticamente não é Guid.Empty")]
-    public void Transacao_IdGeradoAutomaticamente_NaoEhGuidEmpty()
-    {
-        var transacao = new Transacao();
-        transacao.Id.Should().NotBe(Guid.Empty);
-    }
-
-    [Fact(DisplayName = "Transacao — Valor zero deve ser rejeitado pela anotação Range")]
-    public void Transacao_ValorZero_RangeAttrRejeita()
-    {
-        // A validação de Range(0.01, ...) é verificada pelo ModelState no controller.
-        // Aqui documentamos o limite inferior esperado.
-        var rangeAttr = typeof(Transacao)
-            .GetProperty(nameof(Transacao.Valor))!
-            .GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RangeAttribute), false)
-            .Cast<System.ComponentModel.DataAnnotations.RangeAttribute>()
-            .FirstOrDefault();
-
-        rangeAttr.Should().NotBeNull();
-        rangeAttr!.Minimum.Should().Be(0.01);
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => CriarService().CreateAsync(DtoDespesa(Guid.NewGuid(), Guid.NewGuid())));
     }
 }

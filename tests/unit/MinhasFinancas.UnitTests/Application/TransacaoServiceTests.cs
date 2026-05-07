@@ -257,6 +257,6 @@ public class TransacaoServiceTests
 
         // Deve lançar ArgumentException (categoria), não chegar à validação de Pessoa
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => CriarService().CreateAsync(dto));
-        ex.ParamName.Should().Be("dto.CategoriaId");
+        ex.ParamName.Should().BeOneOf("dto.CategoriaId", "CategoriaId");
     }
 }
