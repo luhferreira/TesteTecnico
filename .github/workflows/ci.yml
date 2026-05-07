@@ -1,0 +1,189 @@
+name: CI — Testes Automatizados
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  NODE_VERSION: '20'
+
+jobs:
+  # ===========================================================================
+  # Testes Unitários (.NET)
+  # ===========================================================================
+  unit-tests:
+    name: Testes Unitários (.NET)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore tests/unit/MinhasFinancas.UnitTests/MinhasFinancas.UnitTests.csproj
+
+      - name: Build
+        run: dotnet build tests/unit/MinhasFinancas.UnitTests/MinhasFinancas.UnitTests.csproj --no-restore
+
+      - name: Test
+        run: |
+          dotnet test tests/unit/MinhasFinancas.UnitTests/MinhasFinancas.UnitTests.csproj \
+            --no-build \
+            --verbosity normal \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage/unit
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-unit
+          path: ./coverage/unit
+
+  # ===========================================================================
+  # Testes Unitários (Vitest — Frontend)
+  # ===========================================================================
+  vitest:
+    name: Testes Unitários (Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: tests/e2e
+        run: bun install
+
+      - name: Run Vitest
+        working-directory: tests/e2e
+        run: bun run test:unit:coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-vitest
+          path: tests/e2e/coverage
+
+  # ===========================================================================
+  # Testes de Integração (.NET) — requer a aplicação via Docker
+  # ===========================================================================
+  integration-tests:
+    name: Testes de Integração (.NET)
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Checkout do repositório da APLICAÇÃO em um diretório paralelo.
+      # Ajuste 'your-org/minhas-financas' para o repositório real da aplicação.
+      - name: Checkout da aplicação
+        uses: actions/checkout@v4
+        with:
+          repository: your-org/minhas-financas   # ⚠️ Ajuste aqui
+          path: app
+          token: ${{ secrets.APP_REPO_TOKEN }}
+
+      - name: Inicia serviços via Docker Compose
+        working-directory: app
+        run: |
+          docker compose up -d api
+          echo "Aguardando API..."
+          timeout 60 bash -c 'until curl -sf http://localhost:5000/swagger/index.html; do sleep 2; done'
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore tests/integration/MinhasFinancas.IntegrationTests/MinhasFinancas.IntegrationTests.csproj
+
+      - name: Test
+        run: |
+          dotnet test tests/integration/MinhasFinancas.IntegrationTests/MinhasFinancas.IntegrationTests.csproj \
+            --no-build \
+            --verbosity normal \
+            --results-directory ./coverage/integration
+
+      - name: Stop services
+        if: always()
+        working-directory: app
+        run: docker compose down
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-results
+          path: ./coverage/integration
+
+  # ===========================================================================
+  # Testes E2E (Playwright) — requer stack completa
+  # ===========================================================================
+  e2e-tests:
+    name: Testes E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: integration-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout da aplicação
+        uses: actions/checkout@v4
+        with:
+          repository: your-org/minhas-financas   # ⚠️ Ajuste aqui
+          path: app
+          token: ${{ secrets.APP_REPO_TOKEN }}
+
+      - name: Inicia stack completa
+        working-directory: app
+        run: |
+          docker compose up -d
+          echo "Aguardando frontend..."
+          timeout 90 bash -c 'until curl -sf http://localhost:5173; do sleep 3; done'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        working-directory: tests/e2e
+        run: bun install
+
+      - name: Install Playwright browsers
+        working-directory: tests/e2e
+        run: bun run playwright:install
+
+      - name: Run Playwright tests
+        working-directory: tests/e2e
+        run: bun run test:e2e
+        env:
+          FRONTEND_URL: http://localhost:5173
+          API_URL: http://localhost:5000
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: tests/e2e/playwright-report
+
+      - name: Stop services
+        if: always()
+        working-directory: app
+        run: docker compose down
