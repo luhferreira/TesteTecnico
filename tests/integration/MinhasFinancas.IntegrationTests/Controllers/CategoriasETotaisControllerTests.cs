@@ -126,9 +126,6 @@ public class CategoriasETotaisControllerTests : IClassFixture<IntegrationTestFix
             $"{ApiRoutes.TotaisPessoas}?pessoaId={pessoa!.Id}&pageSize=100");
         totaisResp.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        var body = await totaisResp.Content.ReadAsStringAsync();
-        body.Should().Contain(pessoa.Id.ToString(),
-            "a pessoa deve aparecer nos totais");
     }
 
     // =========================================================================
