@@ -1,13 +1,4 @@
-import { type Page, type Locator, expect } from '@playwright/test'
-
-// =============================================================================
-// Baseados em:
-//   web/src/lib/routes.ts — paths: /, /transacoes, /categorias, /pessoas, /totais
-//   web/src/components/molecules/TransacaoForm.tsx — campos reais
-//   web/src/components/molecules/PessoaForm.tsx — campos reais
-//   web/src/components/molecules/CategoriaForm.tsx — campos reais
-//   web/src/types/domain.ts — TipoTransacao, Finalidade
-// =============================================================================
+import { type Page, type Locator } from '@playwright/test'
 
 export abstract class BasePage {
   constructor(protected readonly page: Page) {}
@@ -22,13 +13,10 @@ export abstract class BasePage {
 export class PessoasPage extends BasePage {
   readonly url = '/pessoas'
 
-  // PessoaForm usa react-hook-form com labels "Nome" e "Data de Nascimento"
-  readonly btnNovaPessoa    = this.page.getByRole('button', { name: /nova pessoa|adicionar/i })
-  readonly inputNome        = this.page.getByLabel('Nome')
-  readonly inputDataNasc    = this.page.getByLabel('Data de Nascimento')
-  // Botão "Salvar" no PessoaForm
-  readonly btnSalvar        = this.page.getByRole('button', { name: /salvar/i })
-  readonly btnCancelar      = this.page.getByRole('button', { name: /cancelar/i })
+  readonly btnNovaPessoa = this.page.getByRole('button', { name: 'Adicionar Pessoa' })
+  readonly inputNome     = this.page.getByLabel('Nome')
+  readonly inputDataNasc = this.page.getByLabel(/data de nascimento/i)
+  readonly btnSalvar     = this.page.getByRole('button', { name: 'Salvar' })
 
   async goto() {
     await this.page.goto(this.url)
@@ -37,7 +25,7 @@ export class PessoasPage extends BasePage {
 
   async abrirFormNovaPessoa() {
     await this.btnNovaPessoa.click()
-    await this.page.waitForSelector('input', { state: 'visible' })
+    await this.page.waitForTimeout(500)
   }
 
   async criarPessoa(nome: string, dataNascimento: string) {
@@ -48,10 +36,6 @@ export class PessoasPage extends BasePage {
     await this.waitForIdle()
   }
 
-  async pessoaEstaVisivel(nome: string) {
-    return this.page.getByText(nome).isVisible()
-  }
-
   pessoaLocator(nome: string) {
     return this.page.getByText(nome)
   }
@@ -59,25 +43,28 @@ export class PessoasPage extends BasePage {
 
 // =============================================================================
 // TransacoesPage — /transacoes
+// Seletores baseados no snapshot real do Playwright:
+//   button "Adicionar Transação"
+//   dialog "Adicionar Transação"
+//   spinbutton "Valor"
+//   combobox "Tipo"
+//   textbox "Lista de pessoas"
+//   textbox "Lista de categorias"
 // =============================================================================
 export class TransacoesPage extends BasePage {
   readonly url = '/transacoes'
 
-  readonly btnNovaTransacao = this.page.getByRole('button', { name: /nova transação|adicionar/i })
-  readonly inputDescricao   = this.page.getByLabel('Descrição')
-  readonly inputValor       = this.page.getByLabel('Valor')
-  // DateInput usa label "Data"
-  readonly inputData        = this.page.getByLabel('Data')
-  // TipoSelect — label "Tipo"
-  readonly selectTipo       = this.page.getByLabel('Tipo')
-  readonly btnSalvar        = this.page.getByRole('button', { name: /salvar/i })
-
-  // Mensagens de validação (react-hot-toast ou alerts)
-  readonly toastErro        = this.page.locator('[data-hot-toast]').or(
-    this.page.getByRole('alert')
-  )
-  // Aviso de menor de idade no TransacaoForm
-  readonly avisoMenor       = this.page.getByText(/menores só podem registrar despesas/i)
+  readonly btnNovaTransacao = this.page.getByRole('button', { name: 'Adicionar Transação' })
+  readonly inputDescricao   = this.page.getByPlaceholder('Digite a descrição')
+  readonly inputValor       = this.page.getByRole('spinbutton', { name: 'Valor' })
+  readonly selectTipo       = this.page.getByRole('combobox', { name: 'Tipo' })
+  readonly inputPessoa      = this.page.getByRole('textbox', { name: 'Lista de pessoas' })
+  readonly inputCategoria   = this.page.getByRole('textbox', { name: 'Lista de categorias' })
+  readonly btnSalvar        = this.page.getByRole('button', { name: 'Salvar' })
+  readonly btnCancelar      = this.page.getByRole('button', { name: 'Cancelar' })
+  readonly avisoMenor       = this.page.getByText('Menores só podem registrar despesas.')
+  readonly toastSucesso     = this.page.getByText('Transação salva com sucesso!')
+  readonly toastErro        = this.page.getByText(/erro ao salvar/i)
 
   async goto() {
     await this.page.goto(this.url)
@@ -86,37 +73,46 @@ export class TransacoesPage extends BasePage {
 
   async abrirFormNovaTransacao() {
     await this.btnNovaTransacao.click()
-    await this.page.waitForSelector('form', { state: 'visible' })
+    await this.page.getByRole('dialog', { name: 'Adicionar Transação' })
+      .waitFor({ state: 'visible' })
+  }
+
+  async selecionarTipo(tipo: 'receita' | 'despesa') {
+    await this.selectTipo.selectOption(tipo)
   }
 
   async selecionarPessoa(nome: string) {
-    // LazyPessoaSelect é um combobox/select customizado
-    const pessoaSelect = this.page.getByPlaceholder(/pessoa/i)
-      .or(this.page.getByLabel(/pessoa/i))
-    await pessoaSelect.click()
-    await this.page.getByText(nome, { exact: true }).click()
+    await this.inputPessoa.click()
+    await this.inputPessoa.fill(nome)
+    await this.page.waitForTimeout(1000)
+    await this.page.locator('[role="option"]').filter({ hasText: nome }).first().click()
   }
 
   async selecionarCategoria(descricao: string) {
-    const catSelect = this.page.getByPlaceholder(/categoria/i)
-      .or(this.page.getByLabel(/categoria/i))
-    await catSelect.click()
-    await this.page.getByText(descricao, { exact: true }).click()
+    await this.inputCategoria.click()
+    await this.inputCategoria.fill(descricao)
+    await this.page.waitForTimeout(1000)
+    await this.page.locator('[role="option"]').filter({ hasText: descricao }).first().click()
   }
 
   async preencherFormulario(params: {
     descricao: string
     valor: string
     tipo: 'receita' | 'despesa'
-    data?: string
     pessoaNome?: string
     categoriaNome?: string
   }) {
     await this.inputDescricao.fill(params.descricao)
     await this.inputValor.fill(params.valor)
-    await this.selectTipo.selectOption(params.tipo)
-    if (params.data) await this.inputData.fill(params.data)
-    if (params.pessoaNome) await this.selecionarPessoa(params.pessoaNome)
+    await this.selecionarTipo(params.tipo)
+    // Preenche a data no formato yyyy-MM-dd (input type="date" padrão HTML)
+    const hoje = new Date()
+    const dia  = String(hoje.getDate()).padStart(2, '0')
+    const mes  = String(hoje.getMonth() + 1).padStart(2, '0')
+    const ano  = hoje.getFullYear()
+    const dataInput = this.page.getByLabel('Data')
+    await dataInput.fill(`${ano}-${mes}-${dia}`)
+    if (params.pessoaNome)    await this.selecionarPessoa(params.pessoaNome)
     if (params.categoriaNome) await this.selecionarCategoria(params.categoriaNome)
   }
 }
@@ -127,11 +123,10 @@ export class TransacoesPage extends BasePage {
 export class CategoriasPage extends BasePage {
   readonly url = '/categorias'
 
-  readonly btnNovaCategoria = this.page.getByRole('button', { name: /nova categoria|adicionar/i })
+  readonly btnNovaCategoria = this.page.getByRole('button', { name: /adicionar categoria|nova categoria/i })
   readonly inputDescricao   = this.page.getByLabel('Descrição')
-  // FinalidadeSelect usa label "Finalidade"
   readonly selectFinalidade = this.page.getByLabel('Finalidade')
-  readonly btnSalvar        = this.page.getByRole('button', { name: /salvar/i })
+  readonly btnSalvar        = this.page.getByRole('button', { name: 'Salvar' })
 
   async goto() {
     await this.page.goto(this.url)
@@ -140,7 +135,7 @@ export class CategoriasPage extends BasePage {
 
   async criarCategoria(descricao: string, finalidade: 'despesa' | 'receita' | 'ambas') {
     await this.btnNovaCategoria.click()
-    await this.page.waitForSelector('form', { state: 'visible' })
+    await this.page.waitForTimeout(500)
     await this.inputDescricao.fill(descricao)
     await this.selectFinalidade.selectOption(finalidade)
     await this.btnSalvar.click()
@@ -156,11 +151,6 @@ export class DashboardPage extends BasePage {
 
   async goto() {
     await this.page.goto(this.url)
-    await this.waitForIdle()
-  }
-
-  async navegarPara(rotulo: 'Transações' | 'Categorias' | 'Pessoas' | 'Relatórios') {
-    await this.page.getByRole('link', { name: rotulo }).click()
     await this.waitForIdle()
   }
 }
