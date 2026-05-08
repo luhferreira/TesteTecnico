@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MinhasFinancas.Domain</name>
+    </assembly>
+    <members>
+        <member name="T:MinhasFinancas.Domain.Entities.Categoria">
+            <summary>
+            Representa uma categoria de transação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Entities.Categoria.EFinalidade">
+            <summary>
+            Enum para a finalidade da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Categoria.Descricao">
+            <summary>
+            Descrição da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Categoria.Finalidade">
+            <summary>
+            Finalidade da categoria (Despesa, Receita ou Ambas).
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Categoria.Transacoes">
+            <summary>
+            Transações associadas à categoria (propriedade de navegação).
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Entities.Categoria.PermiteTipo(MinhasFinancas.Domain.Entities.Transacao.ETipo)">
+            <summary>
+            Valida se a categoria permite o tipo de transação especificado.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Entities.EntityBase">
+            <summary>
+            Classe base para todas as entidades do domínio.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.EntityBase.Id">
+            <summary>
+            Identificador único da entidade.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Entities.Pessoa">
+            <summary>
+            Representa uma pessoa no sistema de controle de gastos.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Pessoa.Nome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Pessoa.DataNascimento">
+            <summary>
+            Data de nascimento da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Pessoa.Idade">
+            <summary>
+            Idade calculada da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Pessoa.Transacoes">
+            <summary>
+            Transações associadas à pessoa (propriedade de navegação).
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Entities.Pessoa.CalcularIdade">
+            <summary>
+            Calcula a idade baseada na data de nascimento.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Entities.Pessoa.EhMaiorDeIdade">
+            <summary>
+            Verifica se a pessoa é maior de idade.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Entities.Transacao">
+            <summary>
+            Representa uma transação financeira.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Entities.Transacao.ETipo">
+            <summary>
+            Enum para o tipo de transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Descricao">
+            <summary>
+            Descrição da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Valor">
+            <summary>
+            Valor da transação (deve ser positivo).
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Tipo">
+            <summary>
+            Tipo da transação (Despesa ou Receita).
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.CategoriaId">
+            <summary>
+            Identificador da categoria associada.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.PessoaId">
+            <summary>
+            Identificador da pessoa associada.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Data">
+            <summary>
+            Data em que a transação ocorreu.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Categoria">
+            <summary>
+            Categoria associada (propriedade de navegação).
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Entities.Transacao.Pessoa">
+            <summary>
+            Pessoa associada (propriedade de navegação).
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.ICategoriaRepository">
+            <summary>
+            Interface para repositório de Categorias.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.IPessoaRepository">
+            <summary>
+            Interface para repositório de Pessoas.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1">
+            <summary>
+            Interface base para repositórios.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.GetPagedAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém pessoas com paginação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.GetPagedAsync``1(MinhasFinancas.Domain.ValueObjects.PagedRequest,MinhasFinancas.Domain.Interfaces.ISpecification{`0,``0})">
+            <summary>
+            Obtém entidades projetadas para um DTO usando uma specification.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.GetAllAsync">
+            <summary>
+            Obtém todas as entidades.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Obtém entidades que satisfazem uma condição.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.AddAsync(`0)">
+            <summary>
+            Adiciona uma nova entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.UpdateAsync(`0)">
+            <summary>
+            Atualiza uma entidade existente.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.DeleteAsync(`0)">
+            <summary>
+            Remove uma entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IRepositoryBase`1.DeleteAsync(System.Guid)">
+            <summary>
+            Remove uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.ISpecification`2">
+            <summary>
+            Especificação que descreve projeção (select para DTO) e ordenação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.ISpecification`2.Select">
+            <summary>
+            Expressão de projeção de entidade para DTO.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.ISpecification`2.OrderBy">
+            <summary>
+            Expressão de ordenação (opcional).
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.ISpecification`2.OrderByDescending">
+            <summary>
+            Se true, aplica OrderByDescending.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.ISpecification`2.Where">
+            <summary>
+            Optional predicate to filter entities before projection.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.ITotaisQuery">
+            <summary>
+            Interface para consultas de totais.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.ITotaisQuery.GetTotaisPorPessoaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por pessoa com paginação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.ITotaisQuery.GetTotaisPorCategoriaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por categoria com paginação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.ITransacaoRepository">
+            <summary>
+            Interface para repositório de Transações.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.Interfaces.IUnitOfWork">
+            <summary>
+            Interface para Unit of Work.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.IUnitOfWork.Pessoas">
+            <summary>
+            Repositório de Pessoas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.IUnitOfWork.Categorias">
+            <summary>
+            Repositório de Categorias.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.Interfaces.IUnitOfWork.Transacoes">
+            <summary>
+            Repositório de Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IUnitOfWork.SaveChangesAsync">
+            <summary>
+            Salva todas as mudanças.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IUnitOfWork.BeginTransactionAsync">
+            <summary>
+            Inicia uma transação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IUnitOfWork.CommitAsync">
+            <summary>
+            Confirma a transação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Domain.Interfaces.IUnitOfWork.RollbackAsync">
+            <summary>
+            Reverte a transação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.DataFilter">
+            <summary>
+            Reutilizável para representar um período de datas com conveniência de mês/ano.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.IdFilter">
+            <summary>
+            Representa um filtro por id (GUID).
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter">
+            <summary>
+            Filtro específico para consultas de totais por categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter">
+            <summary>
+            Filtro específico para consultas de totais por pessoa.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria">
+            <summary>
+            Value object para totais por categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria.CategoriaId">
+            <summary>
+            Identificador da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria.Descricao">
+            <summary>
+            Descrição da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria.TotalReceitas">
+            <summary>
+            Total de receitas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria.TotalDespesas">
+            <summary>
+            Total de despesas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorCategoria.Saldo">
+            <summary>
+            Saldo (receitas - despesas).
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa">
+            <summary>
+            Value object para totais por pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa.PessoaId">
+            <summary>
+            Identificador da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa.Nome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa.TotalReceitas">
+            <summary>
+            Total de receitas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa.TotalDespesas">
+            <summary>
+            Total de despesas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Domain.ValueObjects.TotalPorPessoa.Saldo">
+            <summary>
+            Saldo (receitas - despesas).
+            </summary>
+        </member>
+    </members>
+</doc>

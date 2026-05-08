@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MinhasFinancas.API</name>
+    </assembly>
+    <members>
+        <member name="T:MinhasFinancas.API.Controllers.CategoriasController">
+            <summary>
+            Controlador para operações com Categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.CategoriasController.#ctor(MinhasFinancas.Application.Services.ICategoriaService)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.CategoriasController.GetAll(System.Int32,System.Int32,System.String)">
+            <summary>
+            Obtém todas as categorias.
+            </summary>
+            <returns>Lista de categorias.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.CategoriasController.GetById(System.Guid)">
+            <summary>
+            Obtém uma categoria pelo ID.
+            </summary>
+            <param name="id">ID da categoria.</param>
+            <returns>Categoria encontrada.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.CategoriasController.Create(MinhasFinancas.Application.DTOs.CreateCategoriaDto)">
+            <summary>
+            Cria uma nova categoria.
+            </summary>
+            <param name="dto">Dados da categoria a ser criada.</param>
+            <returns>Categoria criada.</returns>
+        </member>
+        <member name="T:MinhasFinancas.API.Controllers.PessoasController">
+            <summary>
+            Controlador para operações com Pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.#ctor(MinhasFinancas.Application.Services.IPessoaService)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.GetAll(System.Int32,System.Int32,System.String)">
+            <summary>
+            Obtém todas as pessoas.
+            </summary>
+            <returns>Lista de pessoas.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.GetById(System.Guid)">
+            <summary>
+            Obtém uma pessoa pelo ID.
+            </summary>
+            <param name="id">ID da pessoa.</param>
+            <returns>Pessoa encontrada.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.Create(MinhasFinancas.Application.DTOs.CreatePessoaDto)">
+            <summary>
+            Cria uma nova pessoa.
+            </summary>
+            <param name="dto">Dados da pessoa a ser criada.</param>
+            <returns>Pessoa criada.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.Update(System.Guid,MinhasFinancas.Application.DTOs.UpdatePessoaDto)">
+            <summary>
+            Atualiza uma pessoa existente.
+            </summary>
+            <param name="id">ID da pessoa.</param>
+            <param name="dto">Dados atualizados da pessoa.</param>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.PessoasController.Delete(System.Guid)">
+            <summary>
+            Remove uma pessoa pelo ID.
+            </summary>
+            <param name="id">ID da pessoa.</param>
+        </member>
+        <member name="T:MinhasFinancas.API.Controllers.TotaisController">
+            <summary>
+            Controlador para consultas de totais.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TotaisController.#ctor(MinhasFinancas.Application.Services.ITotalService)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TotaisController.GetTotaisPorPessoa(MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter,System.Int32,System.Int32)">
+            <summary>
+            Obtém totais por pessoa.
+            </summary>
+            <returns>Lista de totais por pessoa.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TotaisController.GetTotaisPorCategoria(MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter,System.Int32,System.Int32)">
+            <summary>
+            Obtém totais por categoria.
+            </summary>
+            <returns>Lista de totais por categoria.</returns>
+        </member>
+        <member name="T:MinhasFinancas.API.Controllers.TransacoesController">
+            <summary>
+            Controlador para operações com Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TransacoesController.#ctor(MinhasFinancas.Application.Services.ITransacaoService)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TransacoesController.GetAll(System.Int32,System.Int32)">
+            <summary>
+            Obtém todas as transações.
+            </summary>
+            <returns>Lista de transações.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TransacoesController.GetById(System.Guid)">
+            <summary>
+            Obtém uma transação pelo ID.
+            </summary>
+            <param name="id">ID da transação.</param>
+            <returns>Transação encontrada.</returns>
+        </member>
+        <member name="M:MinhasFinancas.API.Controllers.TransacoesController.Create(MinhasFinancas.Application.DTOs.CreateTransacaoDto)">
+            <summary>
+            Cria uma nova transação.
+            </summary>
+            <param name="dto">Dados da transação a ser criada.</param>
+            <returns>Transação criada.</returns>
+        </member>
+        <member name="T:MinhasFinancas.API.Extensions.DependencyInjectionExtensions">
+            <summary>
+            Extensões para configuração da injeção de dependência.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Extensions.DependencyInjectionExtensions.AddApplicationServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adiciona os serviços da aplicação ao container DI.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Extensions.DependencyInjectionExtensions.AddInfrastructureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Adiciona os serviços de infraestrutura ao container DI.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.API.Middlewares.ExceptionMiddleware">
+            <summary>
+            Middleware para tratamento global de exceções.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Middlewares.ExceptionMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger{MinhasFinancas.API.Middlewares.ExceptionMiddleware})">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Middlewares.ExceptionMiddleware.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoca o middleware.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.API.Middlewares.ExceptionMiddlewareExtensions">
+            <summary>
+            Extensões para o middleware de exceção.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.API.Middlewares.ExceptionMiddlewareExtensions.UseExceptionMiddleware(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adiciona o middleware de tratamento de exceções.
+            </summary>
+        </member>
+    </members>
+</doc>

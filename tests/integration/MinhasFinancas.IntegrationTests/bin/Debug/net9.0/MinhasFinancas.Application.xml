@@ -1,0 +1,388 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MinhasFinancas.Application</name>
+    </assembly>
+    <members>
+        <member name="T:MinhasFinancas.Application.DTOs.CreateCategoriaDto">
+            <summary>
+            DTO para criação de Categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateCategoriaDto.Descricao">
+            <summary>
+            Descrição da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateCategoriaDto.Finalidade">
+            <summary>
+            Finalidade da categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.CategoriaDto">
+            <summary>
+            DTO de resposta para Categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CategoriaDto.Id">
+            <summary>
+            Identificador único da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CategoriaDto.Descricao">
+            <summary>
+            Descrição da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CategoriaDto.Finalidade">
+            <summary>
+            Finalidade da categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.CreatePessoaDto">
+            <summary>
+            DTO para criação de Pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreatePessoaDto.Nome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreatePessoaDto.DataNascimento">
+            <summary>
+            Data de nascimento da pessoa.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.UpdatePessoaDto">
+            <summary>
+            DTO para atualização de Pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.UpdatePessoaDto.Nome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.UpdatePessoaDto.DataNascimento">
+            <summary>
+            Data de nascimento da pessoa.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.PessoaDto">
+            <summary>
+            DTO de resposta para Pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.PessoaDto.Id">
+            <summary>
+            Identificador único da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.PessoaDto.Nome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.PessoaDto.DataNascimento">
+            <summary>
+            Data de nascimento da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.PessoaDto.Idade">
+            <summary>
+            Idade calculada da pessoa.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.PessoaValidation">
+            <summary>
+            Validações compartilhadas para Pessoa.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.DTOs.PessoaValidation.ValidarDataNascimento(System.DateTime,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validação customizada para data de nascimento.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.CreateTransacaoDto">
+            <summary>
+            DTO para criação de Transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.Descricao">
+            <summary>
+            Descrição da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.Valor">
+            <summary>
+            Valor da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.Tipo">
+            <summary>
+            Tipo da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.CategoriaId">
+            <summary>
+            Identificador da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.PessoaId">
+            <summary>
+            Identificador da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.CreateTransacaoDto.Data">
+            <summary>
+            Data em que a transação ocorreu.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.DTOs.TransacaoDto">
+            <summary>
+            DTO de resposta para Transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.Id">
+            <summary>
+            Identificador único da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.Descricao">
+            <summary>
+            Descrição da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.Valor">
+            <summary>
+            Valor da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.Tipo">
+            <summary>
+            Tipo da transação.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.CategoriaId">
+            <summary>
+            Identificador da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.CategoriaDescricao">
+            <summary>
+            Descrição da categoria.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.PessoaId">
+            <summary>
+            Identificador da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.PessoaNome">
+            <summary>
+            Nome da pessoa.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Application.DTOs.TransacaoDto.Data">
+            <summary>
+            Data em que a transação ocorreu.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.CategoriaService">
+            <summary>
+            Implementação do serviço de Categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.CategoriaService.#ctor(MinhasFinancas.Domain.Interfaces.IUnitOfWork)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.CategoriaService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.CategoriaService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma categoria pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.CategoriaService.CreateAsync(MinhasFinancas.Application.DTOs.CreateCategoriaDto)">
+            <summary>
+            Cria uma nova categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.ICategoriaService">
+            <summary>
+            Interface para serviço de Categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ICategoriaService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ICategoriaService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma categoria pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ICategoriaService.CreateAsync(MinhasFinancas.Application.DTOs.CreateCategoriaDto)">
+            <summary>
+            Cria uma nova categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.IPessoaService">
+            <summary>
+            Interface para serviço de Pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.IPessoaService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.IPessoaService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma pessoa pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.IPessoaService.CreateAsync(MinhasFinancas.Application.DTOs.CreatePessoaDto)">
+            <summary>
+            Cria uma nova pessoa.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.IPessoaService.UpdateAsync(System.Guid,MinhasFinancas.Application.DTOs.UpdatePessoaDto)">
+            <summary>
+            Atualiza uma pessoa existente.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.IPessoaService.DeleteAsync(System.Guid)">
+            <summary>
+            Remove uma pessoa pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.ITotalService">
+            <summary>
+            Interface para serviço de totais.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ITotalService.GetTotaisPorPessoaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por pessoa.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ITotalService.GetTotaisPorCategoriaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.ITransacaoService">
+            <summary>
+            Interface para serviço de Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ITransacaoService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ITransacaoService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma transação pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.ITransacaoService.CreateAsync(MinhasFinancas.Application.DTOs.CreateTransacaoDto)">
+            <summary>
+            Cria uma nova transação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.PessoaService">
+            <summary>
+            Implementação do serviço de Pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.#ctor(MinhasFinancas.Domain.Interfaces.IUnitOfWork)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma pessoa pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.CreateAsync(MinhasFinancas.Application.DTOs.CreatePessoaDto)">
+            <summary>
+            Cria uma nova pessoa.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.UpdateAsync(System.Guid,MinhasFinancas.Application.DTOs.UpdatePessoaDto)">
+            <summary>
+            Atualiza uma pessoa existente.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.PessoaService.DeleteAsync(System.Guid)">
+            <summary>
+            Remove uma pessoa pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.TotalService">
+            <summary>
+            Serviço para cálculos de totais.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TotalService.#ctor(MinhasFinancas.Domain.Interfaces.ITotaisQuery)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TotalService.GetTotaisPorPessoaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por pessoa.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TotalService.GetTotaisPorCategoriaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por categoria.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Services.TransacaoService">
+            <summary>
+            Implementação do serviço de Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TransacaoService.#ctor(MinhasFinancas.Domain.Interfaces.IUnitOfWork)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TransacaoService.GetAllAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém todas as transações com paginação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TransacaoService.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma transação pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Application.Services.TransacaoService.CreateAsync(MinhasFinancas.Application.DTOs.CreateTransacaoDto)">
+            <summary>
+            Cria uma nova transação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Application.Specifications.LambdaSpecification`2">
+            <summary>
+            Implementação simples de specification baseada em expressões lambda.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -40,7 +40,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
         var response = await _client.PostAsJsonAsync(ApiRoutes.Pessoas, payload);
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var criada = await response.Content.ReadFromJsonAsync<PessoaResponse>();
+        var criada = await response.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
         criada!.Id.Should().NotBe(Guid.Empty);
         criada.Nome.Should().Be("Integração Adulto");
     }
@@ -75,14 +75,14 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "GET /api/v1/pessoas/{id} — após criar, retorna dados corretos")]
     public async Task GetPessoaPorId_AposCriar_RetornaDadosCorretos()
     {
-        var payload = new CreatePessoaRequest($"Pessoa Get {Guid.NewGuid():N[..6]}", new DateTime(1985, 3, 22));
+        var payload = new CreatePessoaRequest($"Pessoa Get {Guid.NewGuid().ToString("N")[..6]}", new DateTime(1985, 3, 22));
         var postResp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas, payload);
-        var criada   = await postResp.Content.ReadFromJsonAsync<PessoaResponse>();
+        var criada   = await postResp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
 
         var getResp = await _client.GetAsync($"{ApiRoutes.Pessoas}/{criada!.Id}");
 
         getResp.StatusCode.Should().Be(HttpStatusCode.OK);
-        var pessoa = await getResp.Content.ReadFromJsonAsync<PessoaResponse>();
+        var pessoa = await getResp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
         pessoa!.Nome.Should().Be(payload.Nome);
         pessoa.Idade.Should().BeGreaterThan(0);
     }
@@ -97,7 +97,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
         // Cria pessoa
         var postResp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas,
             new CreatePessoaRequest("Original", new DateTime(1990, 1, 1)));
-        var criada = await postResp.Content.ReadFromJsonAsync<PessoaResponse>();
+        var criada = await postResp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
 
         // Atualiza
         var dto      = new UpdatePessoaRequest("Atualizado", new DateTime(1990, 1, 1));
@@ -106,7 +106,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
 
         // Verifica
         var getResp  = await _client.GetAsync($"{ApiRoutes.Pessoas}/{criada.Id}");
-        var atualizado = await getResp.Content.ReadFromJsonAsync<PessoaResponse>();
+        var atualizado = await getResp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
         atualizado!.Nome.Should().Be("Atualizado");
     }
 
@@ -127,7 +127,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
     {
         var postResp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas,
             new CreatePessoaRequest("Para Deletar", new DateTime(1990, 1, 1)));
-        var criada = await postResp.Content.ReadFromJsonAsync<PessoaResponse>();
+        var criada = await postResp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default);
 
         var delResp = await _client.DeleteAsync($"{ApiRoutes.Pessoas}/{criada!.Id}");
         delResp.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -150,7 +150,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
         // Cria categoria Despesa
         var catResp = await _client.PostAsJsonAsync(ApiRoutes.Categorias,
             new CreateCategoriaRequest("Despesa Cascata", EFinalidade.Despesa));
-        var cat = await catResp.Content.ReadFromJsonAsync<CategoriaResponse>();
+        var cat = await catResp.Content.ReadFromJsonAsync<CategoriaResponse>(JsonOptions.Default);
 
         // Cria transação vinculada à pessoa
         var txResp = await _client.PostAsJsonAsync(ApiRoutes.Transacoes,
@@ -160,7 +160,7 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
         // BUG-003: se não houver cascade no EF, este Post pode retornar 500
         // ao tentar deletar a pessoa com transações vinculadas.
         txResp.IsSuccessStatusCode.Should().BeTrue("a transação deve ser criada com sucesso");
-        var tx = await txResp.Content.ReadFromJsonAsync<TransacaoResponse>();
+        var tx = await txResp.Content.ReadFromJsonAsync<TransacaoResponse>(JsonOptions.Default);
 
         // Deleta a pessoa
         var delResp = await _client.DeleteAsync($"{ApiRoutes.Pessoas}/{pessoa.Id}");
@@ -182,6 +182,6 @@ public class PessoasControllerTests : IClassFixture<IntegrationTestFixture>
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas,
             new CreatePessoaRequest(nome, new DateTime(1985, 6, 15)));
         resp.EnsureSuccessStatusCode();
-        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>())!;
+        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default))!;
     }
 }

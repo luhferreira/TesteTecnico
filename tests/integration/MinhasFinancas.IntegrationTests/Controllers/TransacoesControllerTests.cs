@@ -34,7 +34,7 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas,
             new CreatePessoaRequest(nome, new DateTime(1985, 6, 15)));
         resp.EnsureSuccessStatusCode();
-        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>())!;
+        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default))!;
     }
 
     private async Task<PessoaResponse> CriarMenorAsync(string nome = "Menor Tx")
@@ -43,7 +43,7 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Pessoas,
             new CreatePessoaRequest(nome, nascimento));
         resp.EnsureSuccessStatusCode();
-        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>())!;
+        return (await resp.Content.ReadFromJsonAsync<PessoaResponse>(JsonOptions.Default))!;
     }
 
     private async Task<CategoriaResponse> CriarCatAsync(string descricao, EFinalidade finalidade)
@@ -51,7 +51,7 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Categorias,
             new CreateCategoriaRequest(descricao, finalidade));
         resp.EnsureSuccessStatusCode();
-        return (await resp.Content.ReadFromJsonAsync<CategoriaResponse>())!;
+        return (await resp.Content.ReadFromJsonAsync<CategoriaResponse>(JsonOptions.Default))!;
     }
 
     // =========================================================================
@@ -72,15 +72,15 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — adulto + categoria Receita + tipo Receita retorna 201")]
     public async Task PostTransacao_AdultoReceitaValida_Retorna201()
     {
-        var adulto = await CriarAdultoAsync($"Adulto {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Salário {Guid.NewGuid():N[..6]}", EFinalidade.Receita);
+        var adulto = await CriarAdultoAsync($"Adulto {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Salário {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Receita);
 
         var dto    = new CreateTransacaoRequest("Salário mensal", 5000m, ETipo.Receita,
             cat.Id, adulto.Id, DateTime.Today);
         var resp   = await _client.PostAsJsonAsync(ApiRoutes.Transacoes, dto);
 
         resp.StatusCode.Should().Be(HttpStatusCode.Created);
-        var tx = await resp.Content.ReadFromJsonAsync<TransacaoResponse>();
+        var tx = await resp.Content.ReadFromJsonAsync<TransacaoResponse>(JsonOptions.Default);
         tx!.Id.Should().NotBe(Guid.Empty);
         tx.Valor.Should().Be(5000m);
     }
@@ -88,8 +88,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — menor de idade + Despesa retorna 201")]
     public async Task PostTransacao_MenorDeIdade_ComDespesa_Retorna201()
     {
-        var menor = await CriarMenorAsync($"Menor {Guid.NewGuid():N[..6]}");
-        var cat   = await CriarCatAsync($"Lanche {Guid.NewGuid():N[..6]}", EFinalidade.Despesa);
+        var menor = await CriarMenorAsync($"Menor {Guid.NewGuid().ToString("N")[..6]}");
+        var cat   = await CriarCatAsync($"Lanche {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Despesa);
 
         var dto   = new CreateTransacaoRequest("Lanche", 15m, ETipo.Despesa,
             cat.Id, menor.Id, DateTime.Today);
@@ -104,8 +104,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [InlineData(ETipo.Despesa)]
     public async Task PostTransacao_CategoriaAmbas_QualquerTipo_Retorna201(ETipo tipo)
     {
-        var adulto = await CriarAdultoAsync($"Adulto Ambas {tipo} {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Transf {tipo} {Guid.NewGuid():N[..6]}", EFinalidade.Ambas);
+        var adulto = await CriarAdultoAsync($"Adulto Ambas {tipo} {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Transf {tipo} {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Ambas);
 
         var dto  = new CreateTransacaoRequest($"Transferência {tipo}", 200m, tipo,
             cat.Id, adulto.Id, DateTime.Today);
@@ -123,8 +123,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "BUG-001 — POST Receita para menor retorna 500 (deveria ser 400/422)")]
     public async Task PostTransacao_MenorDeIdade_ComReceita_Retorna500_BUG001()
     {
-        var menor = await CriarMenorAsync($"Menor Receita {Guid.NewGuid():N[..6]}");
-        var cat   = await CriarCatAsync($"Salário Bug {Guid.NewGuid():N[..6]}", EFinalidade.Receita);
+        var menor = await CriarMenorAsync($"Menor Receita {Guid.NewGuid().ToString("N")[..6]}");
+        var cat   = await CriarCatAsync($"Salário Bug {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Receita);
 
         var dto  = new CreateTransacaoRequest("Mesada indevida", 100m, ETipo.Receita,
             cat.Id, menor.Id, DateTime.Today);
@@ -146,8 +146,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "BUG-002 — POST Despesa com categoria Receita retorna 500 (deveria ser 400/422)")]
     public async Task PostTransacao_CategoriaReceitaComDespesa_Retorna500_BUG002()
     {
-        var adulto = await CriarAdultoAsync($"Adulto Compat {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Salário Compat {Guid.NewGuid():N[..6]}", EFinalidade.Receita);
+        var adulto = await CriarAdultoAsync($"Adulto Compat {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Salário Compat {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Receita);
 
         var dto  = new CreateTransacaoRequest("Conta de luz", 150m, ETipo.Despesa,
             cat.Id, adulto.Id, DateTime.Today);
@@ -161,8 +161,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "BUG-002 — POST Receita com categoria Despesa retorna 500 (deveria ser 400/422)")]
     public async Task PostTransacao_CategoriaDespesaComReceita_Retorna500_BUG002()
     {
-        var adulto = await CriarAdultoAsync($"Adulto Desp Rec {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Mercado Rec {Guid.NewGuid():N[..6]}", EFinalidade.Despesa);
+        var adulto = await CriarAdultoAsync($"Adulto Desp Rec {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Mercado Rec {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Despesa);
 
         var dto  = new CreateTransacaoRequest("Freelance", 800m, ETipo.Receita,
             cat.Id, adulto.Id, DateTime.Today);
@@ -179,8 +179,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — valor zero retorna 400 (ModelState Range)")]
     public async Task PostTransacao_ValorZero_Retorna400()
     {
-        var adulto = await CriarAdultoAsync($"Adulto ValZero {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Cat ValZero {Guid.NewGuid():N[..6]}", EFinalidade.Despesa);
+        var adulto = await CriarAdultoAsync($"Adulto ValZero {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Cat ValZero {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Despesa);
 
         var dto  = new CreateTransacaoRequest("Teste", 0m, ETipo.Despesa, cat.Id, adulto.Id, DateTime.Today);
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Transacoes, dto);
@@ -191,8 +191,8 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — descrição vazia retorna 400 (ModelState Required)")]
     public async Task PostTransacao_DescricaoVazia_Retorna400()
     {
-        var adulto = await CriarAdultoAsync($"Adulto DescVazia {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Cat DescVazia {Guid.NewGuid():N[..6]}", EFinalidade.Despesa);
+        var adulto = await CriarAdultoAsync($"Adulto DescVazia {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Cat DescVazia {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Despesa);
 
         var dto  = new CreateTransacaoRequest("", 100m, ETipo.Despesa, cat.Id, adulto.Id, DateTime.Today);
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Transacoes, dto);
@@ -203,7 +203,7 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — pessoa inexistente retorna 400 (ArgumentException)")]
     public async Task PostTransacao_PessoaInexistente_Retorna400()
     {
-        var cat  = await CriarCatAsync($"Cat PessNE {Guid.NewGuid():N[..6]}", EFinalidade.Despesa);
+        var cat  = await CriarCatAsync($"Cat PessNE {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Despesa);
         var dto  = new CreateTransacaoRequest("Teste", 100m, ETipo.Despesa,
             cat.Id, Guid.NewGuid(), DateTime.Today);
         var resp = await _client.PostAsJsonAsync(ApiRoutes.Transacoes, dto);
@@ -215,7 +215,7 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "POST /api/v1/transacoes — categoria inexistente retorna 400 (ArgumentException)")]
     public async Task PostTransacao_CategoriaInexistente_Retorna400()
     {
-        var adulto = await CriarAdultoAsync($"Adulto CatNE {Guid.NewGuid():N[..6]}");
+        var adulto = await CriarAdultoAsync($"Adulto CatNE {Guid.NewGuid().ToString("N")[..6]}");
         var dto    = new CreateTransacaoRequest("Teste", 100m, ETipo.Despesa,
             Guid.NewGuid(), adulto.Id, DateTime.Today);
         var resp   = await _client.PostAsJsonAsync(ApiRoutes.Transacoes, dto);
@@ -237,16 +237,16 @@ public class TransacoesControllerTests : IClassFixture<IntegrationTestFixture>
     [Fact(DisplayName = "GET /api/v1/transacoes/{id} — após criar, retorna dados corretos")]
     public async Task GetTransacaoPorId_AposCriar_RetornaDadosCorretos()
     {
-        var adulto = await CriarAdultoAsync($"Adulto GetTx {Guid.NewGuid():N[..6]}");
-        var cat    = await CriarCatAsync($"Sal GetTx {Guid.NewGuid():N[..6]}", EFinalidade.Receita);
+        var adulto = await CriarAdultoAsync($"Adulto GetTx {Guid.NewGuid().ToString("N")[..6]}");
+        var cat    = await CriarCatAsync($"Sal GetTx {Guid.NewGuid().ToString("N")[..6]}", EFinalidade.Receita);
 
         var criado = await _client.PostAsJsonAsync(ApiRoutes.Transacoes,
             new CreateTransacaoRequest("Salário Get", 4500m, ETipo.Receita,
                 cat.Id, adulto.Id, DateTime.Today));
-        var tx = await criado.Content.ReadFromJsonAsync<TransacaoResponse>();
+        var tx = await criado.Content.ReadFromJsonAsync<TransacaoResponse>(JsonOptions.Default);
 
         var resp    = await _client.GetAsync($"{ApiRoutes.Transacoes}/{tx!.Id}");
-        var obtida  = await resp.Content.ReadFromJsonAsync<TransacaoResponse>();
+        var obtida  = await resp.Content.ReadFromJsonAsync<TransacaoResponse>(JsonOptions.Default);
 
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
         obtida!.Descricao.Should().Be("Salário Get");

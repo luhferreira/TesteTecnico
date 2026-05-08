@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MinhasFinancas.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="T:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext">
+            <summary>
+            Contexto de banco de dados para o sistema Minhas Finanças.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext})">
+            <summary>
+            Construtor do contexto.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext.Pessoas">
+            <summary>
+            DbSet para Pessoas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext.Categorias">
+            <summary>
+            DbSet para Categorias.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext.Transacoes">
+            <summary>
+            DbSet para Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            Configurações do modelo.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Extensions.QueryableExtensions.ApplySpecification``2(System.Linq.IQueryable{``0},MinhasFinancas.Domain.Interfaces.ISpecification{``0,``1})">
+            <summary>
+            Aplica uma specification que define projeção (select) e ordenação.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1">
+            <summary>
+            Interface base para repositórios.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.GetPagedAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém pessoas com paginação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.GetPagedAsync``1(MinhasFinancas.Domain.ValueObjects.PagedRequest,MinhasFinancas.Domain.Interfaces.ISpecification{`0,``0})">
+            <summary>
+            Obtém entidades projetadas para um DTO usando uma specification.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Obtém entidades que satisfazem uma condição.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.AddAsync(`0)">
+            <summary>
+            Adiciona uma nova entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.UpdateAsync(`0)">
+            <summary>
+            Atualiza uma entidade existente.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.DeleteAsync(`0)">
+            <summary>
+            Remove uma entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.OldInterfaces.IRepositoryBase`1.DeleteAsync(System.Guid)">
+            <summary>
+            Remove uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Queries.TotaisFilters">
+            <summary>
+            Predicates separados para filtros de totais: um exclusivo para período (DataFilter)
+            e outros específicos para comparação por id (Pessoa/Categoria). Mantém a
+            responsabilidade de filtragem isolada e composável.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Queries.TotaisFilters.ToDatePredicate(MinhasFinancas.Domain.ValueObjects.DataFilter)">
+            <summary>
+            Gera um predicate que aplica o filtro de datas (data início/data fim).
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Queries.TotaisQuery">
+            <summary>
+            Classe para consultas de totais, sem tracking.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Queries.TotaisQuery.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext,Microsoft.Extensions.Caching.Memory.IMemoryCache)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Queries.TotaisQuery.GetTotaisPorPessoaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorPessoaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por pessoa.
+            Usa consultas baseadas em conjuntos (sem navegar coleções) e soma nula segura.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Queries.TotaisQuery.GetTotaisPorCategoriaAsync(MinhasFinancas.Domain.ValueObjects.TotaisPorCategoriaFilter,MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém totais por categoria.
+            Usa consultas baseadas em conjuntos (sem navegar coleções) e soma nula segura.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Repositories.CategoriaRepository">
+            <summary>
+            Implementação do repositório de Categorias.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.CategoriaRepository.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Repositories.PessoaRepository">
+            <summary>
+            Implementação do repositório de Pessoas.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.PessoaRepository.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1">
+            <summary>
+            Implementação base para repositórios.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext)">
+            <summary>
+            Construtor do repositório base.
+            </summary>
+            <param name="context">Contexto do banco de dados.</param>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.GetPagedAsync(MinhasFinancas.Domain.ValueObjects.PagedRequest)">
+            <summary>
+            Obtém entidades com paginação.
+            </summary>
+            <param name="pageRequest">Parâmetros de paginação e busca.</param>
+            <returns>Resultado paginado contendo as entidades.</returns>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.GetPagedAsync``1(MinhasFinancas.Domain.ValueObjects.PagedRequest,MinhasFinancas.Domain.Interfaces.ISpecification{`0,``0})">
+            <summary>
+            Obtém entidades projetadas para um DTO usando uma specification e paginação.
+            </summary>
+            <typeparam name="TDto">O tipo do DTO de destino.</typeparam>
+            <param name="pageRequest">Parâmetros de paginação e busca.</param>
+            <param name="specification">A especificação contendo projeção, ordenação e filtros.</param>
+            <returns>Resultado paginado contendo os DTOs projetados.</returns>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.GetAllAsync">
+            <summary>
+            Obtém todas as entidades.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.FindAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+            <summary>
+            Obtém entidades que satisfazem uma condição.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.AddAsync(`0)">
+            <summary>
+            Adiciona uma nova entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.UpdateAsync(`0)">
+            <summary>
+            Atualiza uma entidade existente.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.DeleteAsync(`0)">
+            <summary>
+            Remove uma entidade.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.RepositoryBase`1.DeleteAsync(System.Guid)">
+            <summary>
+            Remove uma entidade pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.Repositories.TransacaoRepository">
+            <summary>
+            Implementação do repositório de Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.TransacaoRepository.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.Repositories.TransacaoRepository.GetByIdAsync(System.Guid)">
+            <summary>
+            Obtém uma transação pelo ID.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.SeedData">
+            <summary>
+            Classe para popular dados iniciais no banco.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.SeedData.InitializeAsync(MinhasFinancas.Domain.Interfaces.IUnitOfWork)">
+            <summary>
+            Popula dados iniciais.
+            </summary>
+        </member>
+        <member name="T:MinhasFinancas.Infrastructure.UnitOfWork">
+            <summary>
+            Implementação do Unit of Work.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.#ctor(MinhasFinancas.Infrastructure.Data.MinhasFinancasDbContext)">
+            <summary>
+            Construtor.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.UnitOfWork.Pessoas">
+            <summary>
+            Repositório de Pessoas.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.UnitOfWork.Categorias">
+            <summary>
+            Repositório de Categorias.
+            </summary>
+        </member>
+        <member name="P:MinhasFinancas.Infrastructure.UnitOfWork.Transacoes">
+            <summary>
+            Repositório de Transações.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.SaveChangesAsync">
+            <summary>
+            Salva todas as mudanças.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.BeginTransactionAsync">
+            <summary>
+            Inicia uma transação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.CommitAsync">
+            <summary>
+            Confirma a transação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.RollbackAsync">
+            <summary>
+            Reverte a transação.
+            </summary>
+        </member>
+        <member name="M:MinhasFinancas.Infrastructure.UnitOfWork.Dispose">
+            <summary>
+            Libera recursos.
+            </summary>
+        </member>
+    </members>
+</doc>
